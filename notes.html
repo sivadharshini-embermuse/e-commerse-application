@@ -1,0 +1,159 @@
+npm init -y 
+npm i express 
+changed type to module in package.json file
+created backend folder and inside it created app.js and server.js files
+in app.js file imported express and created an instance of express and exported it  
+in server.js file imported app and started the server on port 3000 and logged a message to the console when the server is running
+add start script in package.json file to run the server using npm start command
+added nodemon as a dev dependency and updated the start script to use nodemon for development purposes 
+installed dotenv package to manage environment variables
+created a config.env file in the backend/config folder and added PORT variable to it
+configured dotenv in server.js file to load environment variables from config.env file
+inside app.js file imported the ProductRoute and used it as middleware for the /api/v1/products route
+Created a routes folder in the backend and inside it created ProductRoute.js file
+imported express and created a router instance in ProductRoute.js file and exported it
+created controllers folder in the backend and inside it created ProductController.js file
+exported a function in ProductController.js file to handle the logic for getting products
+
+day7
+mongodb setup and connection
+installed mongoose package to connect to MongoDB database
+created a db.js file in the backend/config folder to manage database connection
+imported mongoose and dotenv in db.js file and configured dotenv to load environment variables from config.env file
+exported a function in db.js file to connect to the MongoDB database using the connection string from environment variables
+imported the connectDB function from db.js file in server.js file and called it before starting the server to establish a connection to the database
+
+created models folder in the backend and inside it created ProductModel.js file
+imported mongoose and created a schema for the Product model in ProductModel.js file and exported the model
+
+created a function in ProductController.js file to handle the logic for adding a new product to the database using the Product model
+updated the ProductRoute.js file to include a POST route for adding a new product and linked it to the addProduct function in ProductController.js file
+updated the ProductRoute.js file to include a GET route for fetching all products and linked it to the getAllProduct function in ProductController.js file
+updated the ProductRoute.js file to include a GET route for fetching a single product by its ID and linked it to the getSingleProduct function in ProductController.js file
+
+created helper folder to manage custom error handling and inside it created ErrorHandler.js file
+exported a class in ErrorHandler.js file to create custom error objects with status code and message    
+
+created middleware folder in the backend and inside it created Error.js file to handle errors globally
+imported the ErrorHandler class in Error.js file and exported a middleware function to handle errors globally   
+eported the error handling middleware in app.js file and used it after all routes to catch any errors that occur in the application
+
+changed the updateProduct function in ProductController.js file to use the next function to pass errors to the global error handler instead of sending a response directly from the controller
+
+handled unhandled promise rejections and uncaught exceptions in server.js file to gracefully shut down the server in case of any unexpected errors
+
+day 10 
+functionality to UPLOAD DUMMY DATA IN MONGODB and do search operation through api 
+
+use e-commerce
+db.products.insertMany([
+  {
+    name: "Hero Pen",
+    description: "Nice and clean",
+    price: 5,
+    ratings: 4.2,
+    category: "Stationary",
+    stock: 20,
+    numOfReviews: 12,
+    image: [],
+    reviews: [],
+    createdAt: new Date()
+  }, multiple products ....
+  ])
+
+  after this aknowledge = true;
+
+  db.products.find() paste this.. 
+
+  db.products.aggregate([
+  { $group: { _id: "$category" } },
+
+  { $sort: { _id: 1 } },
+
+  { 
+    $project: { 
+      category: "$_id",
+      _id: 0
+    } 
+  }
+])
+
+db.products.aggregate([
+  {
+    $group: {
+      _id: "$category",
+      count: { $sum: 1 }
+    }
+  },
+
+  {
+    $sort: { count: -1 }
+  },
+
+  {
+    $project: {
+      category: "$_id",
+      count: 1,
+      _id: 0
+    }
+  }
+])
+
+
+
+created a helper class in ApiHelper.js file to manage search, filter, and pagination functionality for the product API
+imported the ApiHelper class in ProductController.js file and used it in the getAllProduct function to implement search functionality based on query parameters
+updated the getAllProduct function in ProductController.js file to use the ApiHelper class for filtering products based on price and rating, and for implementing pagination based on page and limit query parameters       
+ 
+
+day 12 
+user registration and password hashing using bcryptjs package
+
+created a UserModel.js file in the models folder to define the schema for the User model and exported it
+installed bcryptjs package to hash user passwords before saving them to the database
+npm install validator package to validate user input during registration for not manually validating the email and password fields
+
+created a function in UserController.js file to handle user registration logic, including hashing the password using bcryptjs before saving the user to the database
+updated the routes to include a POST route for user registration and linked it to the registration function in UserController.js file
+
+created userroutes.js file in the routes folder to manage user-related routes and imported it in app.js file to use it as middleware for the /api/v1/users route 
+
+npm install bcryptjs package to hash user passwords before saving them to the database
+
+changes in UserController.js file to handle user registration logic, including hashing the password using bcryptjs before saving the user to the database
+updated the routes to include a POST route for user registration and linked it to the registration function in
+UserController.js file
+
+
+day 13
+
+jwt ?
+
+json web token is a compact, URL-safe means of representing claims to be transferred between two parties. 
+It is commonly used for authentication and authorization purposes in web applications.
+
+installed jsonwebtoken package to generate and verify JWT tokens for user authentication
+
+
+created a function in UserController.js file to handle user login logic, including generating a JWT token upon successful authentication
+updated the routes to include a POST route for user login and linked it to the login function in UserController.js file
+created a middleware function in UserAuth.js file to verify the JWT token sent in the request headers and protect routes that require authentication
+updated the ProductRoute.js file to use the verifyUser middleware for the GET route that fetches all products, ensuring that only authenticated users can access the product data
+
+what are all the thing today done is 
+ 
+3. Implemented user logout functionality with JWT token invalidation
+created a function in UserController.js file to handle user logout logic, including invalidating the JWT token by adding it to a blacklist or setting an expiration time
+updated the routes to include a GET route for user logout and linked it to the logout function in UserController.js file
+
+after that i have done admin and user access authentication only role: admin can able to add, delete, update the product.
+
+SHA-256 stands for Secure Hash Algorithm - 256 bit. It is a cryptographic hash function that produces a fixed-size 256-bit (32-byte) hash value from input data of any size. It is widely used for data integrity verification and password hashing.
+
+reset password functionality using crypto package to generate a secure token for password reset and store it in the database with an expiration time
+created a function in UserController.js file to handle password reset logic, including generating a reset token, saving it to the user's document in the database, and sending an email to the user with instructions for resetting their password
+updated the routes to include a POST route for initiating the password reset process and linked it to the resetPassword function in UserController.js file
+
+
+key notes for answering questions related to the above code:
+"nodemon is used for automatically restarting the server when file changes in the directory are detected"
