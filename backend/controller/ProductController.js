@@ -90,7 +90,7 @@ export const getSingleProduct = async (req, res, next) => {
     });
 };
 
-
+//add review and rating of a product
 export const reviewProduct = async (req, res, next) => {
     const { rating, comment, productId } = req.body;
     const review = {
@@ -129,6 +129,7 @@ export const reviewProduct = async (req, res, next) => {
     });
 };
 
+// view review and rating of a product by admin
 export const viewreviewProduct = async (req, res, next) => {
     const product = await Product.findById(req.query.id);
     if (!product) {
@@ -137,5 +138,37 @@ export const viewreviewProduct = async (req, res, next) => {
     res.status(200).json({
         success: true,
         reviews: product.reviews,
+    });
+};
+
+//admin view all products
+export const getAdminAllProduct = async (req, res, next) => {
+    const products = await Product.find();  
+    res.status(200).json({
+        success: true,
+        products,
+    });
+};
+
+//admin delete review and rating of a product
+export const admindeleteReviewProduct = async (req, res, next) => {
+    const product = await Product.findById(req.query.productId);
+    if (!product) {
+        return next(new HandleError("Product not found", 404));
+    }
+    const reviews = product.reviews.filter((rev) => rev._id.toString() !== req.query.id.toString());
+    
+    let sum = 0;
+    reviews.forEach((rev) => {
+        sum += rev.rating;
+    });
+    const rating = reviews.length === 0 ? 0 : sum / reviews.length;
+    const numOfReviews=reviews.length;
+
+    await Product.findByIdAndUpdate(req.query.productId, { reviews, rating , numOfReviews}, { new: true, runValidators: true });
+    
+    res.status(200).json({
+        success: true,
+        message: "Review deleted successfully",
     });
 };
