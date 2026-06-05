@@ -16,6 +16,6 @@ router.route("/admin/products").get(verifyUser ,rolebasedAccess("admin"), getAdm
 router.route("/admin/product/review").get(verifyUser ,rolebasedAccess("admin"), viewreviewProduct).delete(verifyUser ,rolebasedAccess("admin"), 
 admindeleteReviewProduct);
 
-router.route("/admin/product/:id").put(verifyUser ,rolebasedAccess("admin"), updateProduct).delete(verifyUser ,rolebasedAccess("admin"), deleteProduct);
+router.route("/admin/products/:id").put(verifyUser ,rolebasedAccess("admin"), updateProduct).delete(verifyUser ,rolebasedAccess("admin"), deleteProduct);
 
 export default router;
