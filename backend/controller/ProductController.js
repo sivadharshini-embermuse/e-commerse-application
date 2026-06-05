@@ -118,13 +118,24 @@ export const reviewProduct = async (req, res, next) => {
         product.reviews.push(review);
         product.numOfReviews = product.reviews.length;
     }
-    let avg = 0;
+    let sum = 0;
     product.reviews.forEach((rev) => {
-        avg += rev.rating;
+        sum += rev.rating;
     });
-    product.ratings = avg / product.reviews.length;
+    product.ratings = sum / product.reviews.length;
     await product.save({ validateBeforeSave: false });
     res.status(200).json({
         success: true,
+    });
+};
+
+export const viewreviewProduct = async (req, res, next) => {
+    const product = await Product.findById(req.query.id);
+    if (!product) {
+        return next(new HandleError("Product not found", 404));
+    }   
+    res.status(200).json({
+        success: true,
+        reviews: product.reviews,
     });
 };
