@@ -238,7 +238,7 @@ const Register = () => {
           {/* Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-lg hover:scale-105 duration-300 shadow-lg"
+            className="w-full py-4 rounded-2xl from-blue-600 to-indigo-600 text-white font-semibold text-lg hover:scale-105 duration-300 shadow-lg"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
