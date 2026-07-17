@@ -3,44 +3,49 @@ import HandleError from "../helper/HandleError.js";
 import { sendtoken } from "../helper/jwttoken.js";
 import sendEmail from "../helper/sendEmail.js";
 import crypto from "crypto";
+import {v2 as cloudinary} from "cloudinary";
 
 
 //user registration
 export const userRegistration = async (req, res, next) => {
-    const { name, email, phone, password, avatar } = req.body; 
-    if (!name) {
-        return next(new HandleError("Name can not be empty", 400));
-    }
-    if (!email) {
-        return next(new HandleError("Email can not be empty", 400));
-    }
-    if (!phone) {
-        return next(new HandleError("Phone number can not be empty", 400));
-    }
-    if (!password) {
-        return next(new HandleError("Password can not be empty", 400));
-    }
+    try {
+        const { name, email, phone, password, avatar } = req.body;
 
-    const user = await User.create({
-        name,
-        email,
-        phone,
-        password,
-        avatar: {
-            public_id: "avatar",
-            url: avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
-        },
-    });
-    sendtoken(user, 201, res);
-    
-    // const token = user.getJWTToken();
+        if (!name || !email || !phone || !password) {
+            return next(new HandleError("Please fill all fields", 400));
+        }
 
-    // res.status(201).json({  
-    //     success: true,
-    //     user,
-    //     token,
-    // });  
+        // Check if email already exists
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return next(new HandleError("User already exists with this email", 400));
+        }
+
+        const mycloud = await cloudinary.uploader.upload(avatar, {
+            folder: "Avathar",
+            width: 150,
+            crop: "scale",
+        });
+
+        const user = await User.create({
+            name,
+            email,
+            phone,
+            password,
+            avatar: {
+                public_id: mycloud.public_id,
+                url: mycloud.secure_url,
+            },
+        });
+
+        sendtoken(user, 201, res);
+
+    } catch (error) {
+        return next(error);
+    }
 };
+
 
 //login user
 export const loginUser = async (req, res, next) => {

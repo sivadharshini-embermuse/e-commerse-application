@@ -29,7 +29,7 @@ const Register = () => {
     (state) => state.user
   );
   const [preview, setPreview] = useState(
-    "https://ui-avatars.com/api/?name=User&background=random"
+    "https://www.pngmart.com/files/23/Profile-PNG-Photo.png"
   );
 
   const [avatar, setAvatar] = useState("");
@@ -84,7 +84,9 @@ const Register = () => {
     myForm.set("email", email);
     myForm.set("phone", phone);
     myForm.set("password", password);
+    if (avatar) {
     myForm.set("avatar", avatar);
+    }
 
     // console.log(myForm.entries());
 
@@ -116,184 +118,144 @@ const Register = () => {
       <PageTitle title="Registration" />
 
       <div
-        className="relative min-h-screen flex items-center justify-center lg:justify-end px-6 lg:pr-24 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url('https://static.vecteezy.com/system/resources/thumbnails/037/125/647/small_2x/ai-generated-generative-ai-shopping-cart-on-neon-gradient-background-80s-and-90s-style-minimalistic-shop-online-free-delivery-discounts-and-sale-concept-photo.jpg')",
-        }}
+      className="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1600&q=80')",
+      }}
       >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/45"></div>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/55"></div>
 
-        {/* Register Card */}
-        <div className="relative z-10 w-full max-w-md lg:max-w-xl xl:max-w-1xl bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl p-8">
+      {/* Card */}
+      <div className="relative z-10 w-full max-w-md md:max-w-lg lg:max-w-xl rounded-3xl bg-white/10 backdrop-blur-2xl shadow-2xl p-10">
 
-          <h1 className="text-4xl font-bold text-center text-slate-800">
-            Create Account
-          </h1>
+        <h1 className="italic text-4xl font-bold text-center text-white">
+          Create Account
+        </h1>
 
-          <p className="text-center text-gray-700 mt-2 mb-8">
-            Join us and start shopping today.
-          </p>
+        <p className="text-center text-gray-200 mt-2 mb-8">
+          Join our E-Commerce Platform
+        </p>
 
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-5"
-          >
+        <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Avatar */}
-
-            <div className="flex justify-start">
-
-              <div className="relative">
-
-                <img
-                  src={preview}
-                  alt="Avatar"
-                  className="w-16 h-16 rounded-xl object-cover border-4 border-blue-500"
-                />
-
-                <label
-                  htmlFor="avatar"
-                  className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 duration-300"
-                >
-                  <Camera size={18} />
-                </label>
-
-                <input
-                  id="avatar"
-                  type="file"
-                  name="avatar"
-                  accept="image/*"
-                  onChange={handleChange}
-                  hidden
-                />
-
-              </div>
-
-            </div>
-
-            {/* Name */}
-
+          {/* Avatar */}
+          <div className="flex justify-center">
             <div className="relative">
-
-              <User
-                size={20}
-                className="absolute left-4 top-4 text-gray-500"
+              <img
+                src={preview}
+                alt="avatar"
+                className="w-28 h-28 rounded-full border-4 border-blue-500 object-cover"
               />
 
-              <input
-                type="text"
-                name="name"
-                value={name}
-                onChange={handleChange}
-                required
-                placeholder="Full Name"
-                className="w-full pl-12 pr-4 py-3 rounded-xl border bg-white outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-            </div>
-
-            {/* Email */}
-
-            <div className="relative">
-
-              <Mail
-                size={20}
-                className="absolute left-4 top-4 text-gray-500"
-              />
-
-              <input
-                type="email"
-                name="email"
-                value={email}
-                onChange={handleChange}
-                required
-                placeholder="Email Address"
-                className="w-full pl-12 pr-4 py-3 rounded-xl border bg-white outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-            </div>
-
-            {/* Phone */}
-
-            <div className="relative">
-
-              <Phone
-                size={20}
-                className="absolute left-4 top-4 text-gray-500"
-              />
-
-              <input
-                type="tel"
-                name="phone"
-                value={phone}
-                onChange={handleChange}
-                required
-                placeholder="Phone Number"
-                className="w-full pl-12 pr-4 py-3 rounded-xl border bg-white outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-            </div>
-
-            {/* Password */}
-
-            <div className="relative">
-
-              <Lock
-                size={20}
-                className="absolute left-4 top-4 text-gray-500"
-              />
-
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={password}
-                onChange={handleChange}
-                required
-                placeholder="Password"
-                className="w-full pl-12 pr-12 py-3 rounded-xl border bg-white outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-4 text-gray-500"
+              <label
+                htmlFor="avatar"
+                className="absolute bottom-1 right-1 bg-blue-600 hover:bg-blue-700 p-2 rounded-full cursor-pointer transition"
               >
-                {showPassword ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
+                <Camera size={20} className="text-white" />
+              </label>
 
+              <input
+                hidden
+                id="avatar"
+                type="file"
+                name="avatar"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              
+              
             </div>
+            
+          </div>
 
-            {/* Register Button */}
+          <p className="text-center">Providing profile picture is Manditory</p>
+          {/* Name */}
+          <div className="relative">
+            <User className="absolute left-4 top-4 text-gray-400" size={20} />
+
+            <input
+              type="text"
+              name="name"
+              value={name}
+              onChange={handleChange}
+              placeholder="Full Name"
+              className="w-full pl-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Email */}
+          <div className="relative">
+            <Mail className="absolute left-4 top-4 text-gray-400" size={20} />
+
+            <input
+              type="email"
+              name="email"
+              value={email}
+              onChange={handleChange}
+              placeholder="Email Address"
+              className="w-full pl-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="relative">
+            <Phone className="absolute left-4 top-4 text-gray-400" size={20} />
+
+            <input
+              type="tel"
+              name="phone"
+              value={phone}
+              onChange={handleChange}
+              placeholder="Phone Number"
+              className="w-full pl-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="relative">
+            <Lock className="absolute left-4 top-4 text-gray-400" size={20} />
+
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={password}
+              onChange={handleChange}
+              placeholder="Password"
+              className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+            />
 
             <button
-              type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:scale-105 duration-300"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-4 text-gray-300"
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
+          </div>
 
-            {/* Login */}
+          {/* Button */}
+          <button
+            type="submit"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-lg hover:scale-105 duration-300 shadow-lg"
+          >
+            {loading ? "Creating Account..." : "Create Account"}
+          </button>
 
-            <p className="text-center text-gray-700">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="text-blue-600 font-semibold hover:underline"
-              >
-                Login
-              </Link>
-            </p>
+          <p className="text-center text-gray-200">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-blue-300 font-semibold hover:underline"
+            >
+              Login
+            </Link>
+          </p>
 
-          </form>
-
-        </div>
+        </form>
       </div>
+    </div>
     </>
   );
 };

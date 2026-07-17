@@ -2,11 +2,17 @@ import { connect } from "mongoose";
 import app from "./app.js";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import {v2 as cloudinary} from "cloudinary";
 
 // dotenv.config({ path: ".env" });
 dotenv.config({ path: "./config/config.env" });
 const PORT = process.env.PORT || 3000;
 
+cloudinary.config({ 
+        cloud_name:process.env.cloudinary_cloud_name, 
+        api_key: process.env.cloudinary_api_key, 
+        api_secret: process.env.cloudinary_api_secret
+    });
 
 connectDB();
 process.on("uncaughtException", (err) => {

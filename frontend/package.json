@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
+    "@tsparticles/react": "^4.3.2",
+    "@tsparticles/slim": "^4.3.2",
     "axios": "^1.18.0",
     "express-fileupload": "^1.5.2",
     "lucide-react": "^1.17.0",
