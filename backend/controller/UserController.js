@@ -7,12 +7,15 @@ import crypto from "crypto";
 
 //user registration
 export const userRegistration = async (req, res, next) => {
-    const { name, email, password } = req.body; 
+    const { name, email, phone, password, avatar } = req.body; 
     if (!name) {
         return next(new HandleError("Name can not be empty", 400));
     }
     if (!email) {
         return next(new HandleError("Email can not be empty", 400));
+    }
+    if (!phone) {
+        return next(new HandleError("Phone number can not be empty", 400));
     }
     if (!password) {
         return next(new HandleError("Password can not be empty", 400));
@@ -21,13 +24,15 @@ export const userRegistration = async (req, res, next) => {
     const user = await User.create({
         name,
         email,
+        phone,
         password,
         avatar: {
-            public_id: "sample_id",
-            url: "sample_url",
+            public_id: "avatar",
+            url: avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
         },
     });
     sendtoken(user, 201, res);
+    
     // const token = user.getJWTToken();
 
     // res.status(201).json({  
@@ -251,10 +256,20 @@ export const updatePassword = async (req, res, next) => {
 
 //update profile for already logged in user
 export const updateProfile = async (req, res, next) => {
-    const {name, email} = req.body;
+    const {name, email, avatar} = req.body;
+
+    const newUser={
+        name, email,
+    };
+    if (avatar){
+        newUser.avatar={
+            public_id: avatar.public_id || "sample_id",
+            url: avatar.url || avatar,
+        };
+    }
     const user = await User.findByIdAndUpdate(
         req.user.id,
-        { name, email },
+        newUser,
         { new: true, runValidators: true }
     );
     res.status(200).json({

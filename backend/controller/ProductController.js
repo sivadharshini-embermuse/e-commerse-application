@@ -15,8 +15,9 @@ export const addProduct = async (req, res) => {
 };
 
 // get all products
-export const getAllProduct = async (req, res) => {
-    const resultPerPage = 4;
+export const getAllProduct = async (req, res, next) => {
+
+    const resultPerPage = 20;
     const apihelper = new ApiHelper(Product, req.query).search().filter();
     const filteredQuery = apihelper.query.clone();
     const Productcount = await filteredQuery.countDocuments();
@@ -36,6 +37,7 @@ export const getAllProduct = async (req, res) => {
         totalpages,
         currentpage: Page,   
     });
+
 };
 
 // update product by id
@@ -76,7 +78,10 @@ export const deleteProduct = async (req, res, next) => {
 export const getSingleProduct = async (req, res, next) => {
     // console.log(req.params);
 
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate(
+        "reviews.user",
+        "name avatar"
+    );
     if (!product) {
         // return res.status(404).json({
         //     success: false,
@@ -84,9 +89,20 @@ export const getSingleProduct = async (req, res, next) => {
         // });
         return next(new HandleError("Product not found", 404));
     } 
-     return res.status(200).json({
+    const productData = product.toObject();
+    productData.reviews = productData.reviews.map((review) => {
+        const user = review.user;
+        return {
+            ...review,
+            user: user?._id || user,
+            name: review.name || user?.name,
+            avatar: review.avatar || user?.avatar?.url || "",
+        };
+    });
+
+    return res.status(200).json({
         success:true,
-        product,
+        product: productData,
     });
 };
 
@@ -95,22 +111,30 @@ export const reviewProduct = async (req, res, next) => {
     const { rating, comment, productId } = req.body;
     const review = {
         user: req.user.id,
+        avatar:req.user.avatar?.url || "",
         name: req.user.name,
         rating: Number(rating),
         comment,
     };
+    console.log(review);
     const product = await Product.findById(productId);
     if (!product) {
         return next(new HandleError("Product not found", 404));
     }
+    // console.log(req.user);
+    // console.log(product);
+    // console.log(product.reviews);
     const isReviewed = product.reviews.find(
         (rev) => rev.user.toString() === req.user.id.toString()
     );
+    
     if (isReviewed) {
         product.reviews.forEach((rev) => {
             if (rev.user.toString() === req.user.id.toString()) {
                 rev.rating = rating;
                 rev.comment = comment;
+                rev.avatar = req.user.avatar?.url || "";
+                rev.name = req.user.name;
             }   
         });
     }
@@ -127,17 +151,34 @@ export const reviewProduct = async (req, res, next) => {
     res.status(200).json({
         success: true,
     });
+
 };
+
+
 
 // view review and rating of a product by admin
 export const viewreviewProduct = async (req, res, next) => {
-    const product = await Product.findById(req.query.id);
+    const product = await Product.findById(req.query.id).populate(
+        "reviews.user",
+        "name avatar"
+    );
     if (!product) {
         return next(new HandleError("Product not found", 404));
     }   
+    const reviews = product.reviews.map((review) => {
+        const reviewData = review.toObject();
+        const user = reviewData.user;
+        return {
+            ...reviewData,
+            user: user?._id || user,
+            name: reviewData.name || user?.name,
+            avatar: reviewData.avatar || user?.avatar?.url || "",
+        };
+    });
+
     res.status(200).json({
         success: true,
-        reviews: product.reviews,
+        reviews,
     });
 };
 

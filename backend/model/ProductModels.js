@@ -11,6 +11,11 @@ const productSchema = new mongoose.Schema({
     required: [true, "Please enter product price"],
     },
 
+    MRP:{
+    type:Number,
+    required: [true, "please enter product MRP"]
+    },
+
     description: {
     type: String,
     required: [true, "Please enter product description"],
@@ -57,6 +62,9 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
         },
+        avatar:{
+        type: String,
+        },
         rating: {
         type: Number,
         required: true,
@@ -64,6 +72,10 @@ const productSchema = new mongoose.Schema({
         comment: {
         type: String,
         required: true,
+        },
+        createdAt: {
+        type: Date,
+        default: Date.now,
         },
     },
     ],

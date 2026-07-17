@@ -22,9 +22,14 @@ const userSchema = new mongoose.Schema(
     type: String,
     required: [true, "Please enter your password"],
     minlength: [8, "Password should be at least 8 characters"],
-    Select: false,
+    select: false,
 
     },      
+
+    phone: {
+    type: String,
+    required: [true, "Please enter your phone number"],
+    },
 
     avatar: {
     public_id: {
@@ -36,7 +41,7 @@ const userSchema = new mongoose.Schema(
         required: true,
     },
     },  
-     
+
 
     role: {
     type: String,

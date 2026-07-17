@@ -2,13 +2,50 @@ class Apihelper {
   constructor(query, queryStr) {
     this.query = query;// mongodb query
     this.queryStr = queryStr;// query from url
-   } 
+  }
+
+  escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  getSearchWords(value) {
+    return value
+      ? value
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean)
+          .map((word) => this.escapeRegex(word))
+      : [];
+  }
+
+  getCategoryWords(category) {
+    const words = this.getSearchWords(category);
+    const aliases = {
+      dress: ["clothing", "clothes", "fashion", "apparel", "wear", "shirt", "tshirt", "jeans", "kurta", "saree"],
+      electronics: ["electronic", "electrical", "appliance", "appliances", "mobile", "phone", "laptop"],
+      "home decor": ["home", "decor", "kitchen", "household", "furnishing"],
+      sports: ["sport", "fitness", "gym"],
+      books: ["book", "novel"],
+      toys: ["toy", "game"],
+      "health & beauty": ["health", "beauty", "personal", "care", "skincare", "makeup"],
+      furniture: ["furniture", "chair", "table", "sofa", "bed"],
+      "baby products": ["baby", "kids", "child", "infant"],
+    };
+    const aliasWords = aliases[category?.toLowerCase()] || [];
+    return [...new Set([...words, ...aliasWords.map((word) => this.escapeRegex(word))])];
+  }
+
   search() {
-    const keyword = this.queryStr.keyword
+    const keywordParts = this.getSearchWords(this.queryStr.keyword);
+    const keyword = keywordParts.length
       ? {
-            name: { $regex: this.queryStr.keyword, $options: "i" }, //"i" for case insensitive search
+          $or: keywordParts.flatMap((word) => [
+            { name: { $regex: word, $options: "i" } },
+            { description: { $regex: word, $options: "i" } },
+            { category: { $regex: word, $options: "i" } },
+          ]),
         }
-        : {};
+      : {};
     this.query = this.query.find({ ...keyword });
     return this;
   } 
@@ -19,6 +56,11 @@ class Apihelper {
     const removeFields = ["keyword", "page", "limit"];
     removeFields.forEach((key) => delete queryCopy[key]);
 
+    if (queryCopy.category) {
+      const categoryWords = this.getCategoryWords(queryCopy.category);
+      queryCopy.category = { $regex: categoryWords.join("|"), $options: "i" };
+    }
+
     // Filter for price and rating
     let queryStr = JSON.stringify(queryCopy);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
@@ -26,7 +68,7 @@ class Apihelper {
     return this;
   }     
     pagination(resultPerPage) {
-    const currentPage = Number(this.query.page) || 1;
+    const currentPage = Number(this.queryStr.page) || 1;
     const skip = resultPerPage * (currentPage - 1);
     this.query = this.query.limit(resultPerPage).skip(skip);
     return this;
