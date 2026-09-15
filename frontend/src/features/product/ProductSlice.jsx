@@ -56,6 +56,44 @@ export const createReview = createAsyncThunk(
     }
 );
 
+export const getAdminProducts = createAsyncThunk('products/getAdminProducts', async (_, { rejectWithValue }) => {
+    try {
+        const { data } = await axios.get('/api/v1/admin/products', { withCredentials: true });
+        return data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Products not found");
+    }
+});
+
+export const createProduct = createAsyncThunk('products/createProduct', async (productData, { rejectWithValue }) => {
+    try {
+        const config = { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true };
+        const { data } = await axios.post('/api/v1/admin/product/create', productData, config);
+        return data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to create product");
+    }
+});
+
+export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, productData }, { rejectWithValue }) => {
+    try {
+        const config = { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true };
+        const { data } = await axios.put(`/api/v1/admin/products/${id}`, productData, config);
+        return data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to update product");
+    }
+});
+
+export const deleteProduct = createAsyncThunk('products/deleteProduct', async (id, { rejectWithValue }) => {
+    try {
+        const { data } = await axios.delete(`/api/v1/admin/products/${id}`, { withCredentials: true });
+        return data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to delete product");
+    }
+});
+
 const ProductSlice = createSlice({
     name: 'products',
     initialState: {
@@ -66,11 +104,21 @@ const ProductSlice = createSlice({
         product:null,
         resultPerPage: 5,
         totalpages: 0,
+        isDeleted: false,
+        isUpdated: false,
+        isCreated: false,
+        successMessage: null,
     },
     reducers: {
         removeError: (state) => {
             state.error = null;
         },
+        resetProductStatus: (state) => {
+            state.isCreated = false;
+            state.isDeleted = false;
+            state.isUpdated = false;
+            state.successMessage = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -108,8 +156,69 @@ const ProductSlice = createSlice({
                 state.product = [];
                 state.error = action.payload || action.error.message||'product not found';
             });
+
+        // Admin Actions
+        builder
+            .addCase(getAdminProducts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAdminProducts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.products = action.payload?.products || [];
+            })
+            .addCase(getAdminProducts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Failed to get products";
+            });
+
+        builder
+            .addCase(createProduct.pending, (state) => {
+                state.loading = true;
+                state.isCreated = false;
+            })
+            .addCase(createProduct.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isCreated = action.payload.success;
+                state.product = action.payload.product;
+                state.successMessage = "Product created successfully!";
+            })
+            .addCase(createProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Product creation failed";
+            });
+
+        builder
+            .addCase(deleteProduct.pending, (state) => {
+                state.loading = true;
+                state.isDeleted = false;
+            })
+            .addCase(deleteProduct.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isDeleted = action.payload.success;
+                state.successMessage = "Product deleted successfully!";
+            })
+            .addCase(deleteProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Product deletion failed";
+            });
+
+        builder
+            .addCase(updateProduct.pending, (state) => {
+                state.loading = true;
+                state.isUpdated = false;
+            })
+            .addCase(updateProduct.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isUpdated = action.payload.success;
+                state.successMessage = "Product updated successfully!";
+            })
+            .addCase(updateProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Product update failed";
+            });
     },
 });
 
-export const { removeError } = ProductSlice.actions;
+export const { removeError, resetProductStatus } = ProductSlice.actions;
 export default ProductSlice.reducer;

@@ -1,10 +1,11 @@
 import express from "express";
 import { rolebasedAccess, verifyUser } from "../helper/UserAuth.js";
-import { createNewOrder, deleteOrderbyadmin, getallorderdetails, getallorderdetailsadmin, getSingleOrder, updateOrderbyadmin } from "../controller/OrderController.js";
+import { createNewOrder, createRazorpayOrder, deleteOrderbyadmin, getallorderdetails, getallorderdetailsadmin, getSingleOrder, updateOrderbyadmin } from "../controller/OrderController.js";
 
 const router = express.Router();
 
 router.route("/new/order").post(verifyUser, createNewOrder);
+router.route("/payment/create-order").post(verifyUser, createRazorpayOrder);
 router.route("/order/:id").get(verifyUser, getSingleOrder);
 router.route("/orders").get(verifyUser, getallorderdetails);
 // router.route("/order/delete/:id").delete(verifyUser, cancelOrderbyuser);

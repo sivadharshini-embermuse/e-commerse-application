@@ -28,6 +28,7 @@ const Register = () => {
   const { loading, error, success } = useSelector(
     (state) => state.user
   );
+
   const [preview, setPreview] = useState(
     "https://www.pngmart.com/files/23/Profile-PNG-Photo.png"
   );
@@ -43,6 +44,7 @@ const Register = () => {
     password: "",
   });
 
+  
   const { name, email, phone, password } = user;
 
   const handleChange = (e) => {
@@ -85,16 +87,11 @@ const Register = () => {
     myForm.set("phone", phone);
     myForm.set("password", password);
     if (avatar) {
-    myForm.set("avatar", avatar);
+      myForm.set("avatar", avatar);
     }
-
-    // console.log(myForm.entries());
-
-    // for (let pair of myForm.entries()) {
-    //   console.log(pair[0] + " : " + pair[1]);
-    // }
     dispatch(register(myForm));
   };
+    
   useEffect(() => {
     if (error){
       toast.error(error,{position:"top-center",duration:3000});
@@ -118,7 +115,7 @@ const Register = () => {
       <PageTitle title="Registration" />
 
       <div
-      className="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+      className="relative h-screen flex items-center justify-center bg-cover bg-center"
       style={{
         backgroundImage:
           "url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1600&q=80')",
@@ -127,18 +124,18 @@ const Register = () => {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/55"></div>
 
-      {/* Card */}
-      <div className="relative z-10 w-full max-w-md md:max-w-lg lg:max-w-xl rounded-3xl bg-white/10 backdrop-blur-2xl shadow-2xl p-10">
+      {/* Cart */}
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white/10 backdrop-blur-xl shadow-2xl p-6">
 
-        <h1 className="italic text-4xl font-bold text-center text-white">
+        <h1 className="italic text-2xl font-bold text-center text-white">
           Create Account
         </h1>
 
-        <p className="text-center text-gray-200 mt-2 mb-8">
+        <p className="text-center text-gray-200 pt-2 pb-2">
           Join our E-Commerce Platform
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-2 m-3">
 
           {/* Avatar */}
           <div className="flex justify-center">
@@ -146,14 +143,14 @@ const Register = () => {
               <img
                 src={preview}
                 alt="avatar"
-                className="w-28 h-28 rounded-full border-4 border-blue-500 object-cover"
+                className="w-15 h-15 rounded-full border-4 border-blue-500 object-cover"
               />
 
               <label
                 htmlFor="avatar"
                 className="absolute bottom-1 right-1 bg-blue-600 hover:bg-blue-700 p-2 rounded-full cursor-pointer transition"
               >
-                <Camera size={20} className="text-white" />
+                <Camera size={10} className="text-white" />
               </label>
 
               <input
@@ -163,17 +160,15 @@ const Register = () => {
                 name="avatar"
                 accept="image/*"
                 onChange={handleChange}
-              />
-              
-              
+              />            
             </div>
             
           </div>
 
-          <p className="text-center">Providing profile picture is Manditory</p>
+          <p className="text-center text-white">Providing profile picture is Manditory</p>
           {/* Name */}
           <div className="relative">
-            <User className="absolute left-4 top-4 text-gray-400" size={20} />
+            <User className="absolute left-2 top-2 text-gray-400" size={20} />
 
             <input
               type="text"
@@ -181,13 +176,13 @@ const Register = () => {
               value={name}
               onChange={handleChange}
               placeholder="Full Name"
-              className="w-full pl-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-12 py-2 rounded-xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Email */}
           <div className="relative">
-            <Mail className="absolute left-4 top-4 text-gray-400" size={20} />
+            <Mail className="absolute left-2 top-2 text-gray-400" size={20} />
 
             <input
               type="email"
@@ -195,13 +190,13 @@ const Register = () => {
               value={email}
               onChange={handleChange}
               placeholder="Email Address"
-              className="w-full pl-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-12 py-2 rounded-xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Phone */}
           <div className="relative">
-            <Phone className="absolute left-4 top-4 text-gray-400" size={20} />
+            <Phone className="absolute left-2 top-2 text-gray-400" size={20} />
 
             <input
               type="tel"
@@ -209,13 +204,13 @@ const Register = () => {
               value={phone}
               onChange={handleChange}
               placeholder="Phone Number"
-              className="w-full pl-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-12 py-2 rounded-xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Password */}
           <div className="relative">
-            <Lock className="absolute left-4 top-4 text-gray-400" size={20} />
+            <Lock className="absolute left-2 top-2 text-gray-400" size={20} />
 
             <input
               type={showPassword ? "text" : "password"}
@@ -223,13 +218,13 @@ const Register = () => {
               value={password}
               onChange={handleChange}
               placeholder="Password"
-              className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-12 pr-12 py-2 rounded-xl bg-white/20 border border-white/20 text-white placeholder-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-4 text-gray-300"
+              className="absolute right-2 top-2 text-gray-400"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -238,7 +233,7 @@ const Register = () => {
           {/* Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-2xl from-blue-600 to-indigo-600 text-white font-semibold text-lg hover:scale-105 duration-300 shadow-lg"
+            className="w-full py-2 rounded-2xl from-blue-600 to-indigo-600 text-white font-semibold text-lg hover:scale-105 duration-300 shadow-lg"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>

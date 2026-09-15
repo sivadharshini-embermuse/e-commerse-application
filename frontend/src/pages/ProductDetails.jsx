@@ -7,8 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { FaShoppingCart, FaCheckCircle } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { toast } from 'react-toastify';
 
 import { createReview, getProductDetails } from "../features/product/ProductSlice";
+import { addToCart } from "../features/cart/cartSlice";
 
 const ProductDetails = () => {
     const { loading, error, product } = useSelector(
@@ -63,6 +65,31 @@ const ProductDetails = () => {
     const decreaseQty = () => {
         if (quantity <= 1) return;
         setQuantity(quantity - 1);
+    };
+
+    const handleAddToCart = async () => {
+        try {
+            await dispatch(addToCart({
+                productId: product._id,
+                name: product.name,
+                price: product.price,
+                quantity: quantity,
+                description: product.description,
+                images: product.images || product.image,
+                stock: product.stock,
+            })).unwrap();
+
+            toast.success(`${quantity} ${product.name} added to cart!`, {
+                position: "bottom-right",
+                autoClose: 2000,
+            });
+            setQuantity(1);
+        } catch (error) {
+            toast.error(error || 'Failed to add to cart', {
+                position: "bottom-right",
+                autoClose: 2000,
+            });
+        }
     };
 
     const colors = [
@@ -125,7 +152,7 @@ const ProductDetails = () => {
                 <img
                     src={imageUrl}
                     alt={product?.name}
-                    className="w-full h-[450px] object-cover rounded-lg"
+                    className="w-full h-450px object-cover rounded-lg"
                 />
                 </div>
 
@@ -218,8 +245,9 @@ const ProductDetails = () => {
 
                     {/* Add To Cart */}
                     <button
+                    onClick={handleAddToCart}
                     disabled={product?.stock === 0}
-                    className={`flex items-center gap-3 px-8 py-3 rounded-md shadow-lg transition ${
+                    className={`flex items-center gap-3 px-3 py-3 rounded-md shadow-lg transition ${
                         product?.stock > 0
                         ? "bg-blue-600 hover:bg-blue-700 text-white"
                         : "bg-gray-400 text-white cursor-not-allowed"

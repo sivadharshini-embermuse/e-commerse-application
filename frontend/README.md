@@ -82,7 +82,7 @@ Frontend: API call and Redux
         const { products, loading, error } = useSelector(state => state.products)
         dispatch(getProducts()) inside useEffect
         maps products to <Product product={product} />
-6) Product card display
+6) Product cart display
     File: Product.jsx
     It shows:
         image

@@ -1,11 +1,9 @@
-import { connect } from "mongoose";
 import app from "./app.js";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import {v2 as cloudinary} from "cloudinary";
 
-// dotenv.config({ path: ".env" });
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({ path: "config/config.env" });
 const PORT = process.env.PORT || 3000;
 
 cloudinary.config({ 
@@ -15,15 +13,40 @@ cloudinary.config({
     });
 
 connectDB();
-process.on("uncaughtException", (err) => {
-  console.log(`Error: ${err.message}`);
-  console.log("Shutting down the server due to uncaught exception");
-  process.exit(1);
-}); 
 
 const server= app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
+
+const closeServer = (exitCode = 0) => {
+    server.close(() => {
+        process.exit(exitCode);
+    });
+};
+
+server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+        console.log(`Port ${PORT} is already in use. Stop the other server or change PORT in config/config.env.`);
+        process.exit(1);
+    }
+
+    throw err;
+});
+
+process.once("SIGUSR2", () => {
+    server.close(() => {
+        process.kill(process.pid, "SIGUSR2");
+    });
+});
+
+process.on("SIGINT", () => closeServer(0));
+process.on("SIGTERM", () => closeServer(0));
+
+process.on("uncaughtException", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log("Shutting down the server due to uncaught exception");
+  closeServer(1);
+}); 
 
 process.on("unhandledRejection", (err) => {
     console.log("ERROR NAME:", err.name);

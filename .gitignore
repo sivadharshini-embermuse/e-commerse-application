@@ -1,1 +1,7 @@
-node_modules
+node_modules/
+.env
+*.env
+backend/config/config.env
+frontend/.env
+frontend/.env.*
+!.env.example

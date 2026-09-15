@@ -141,8 +141,7 @@ export const forgotPassword = async (req, res, next) => {
         console.log(error);
         return next(new HandleError("could not save reset password try again later", 500));
     }   
-
-    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/reset/${resetToken}`;
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
     const message = `Resetyour password with this link below :- \n\n ${resetPasswordUrl} \n\n This link will expire in 30 minutes.\n\n If you have not requested this email then, please ignore it.`;   
     const messagehtml =`
     <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
@@ -243,43 +242,58 @@ export const profile = async (req, res, next) => {
 export const updatePassword = async (req, res, next) => {
     
     const {oldpassword, newpassword, confirmpassword} = req.body;
+
     const user = await User.findById(req.user.id).select("+password");
+
     if (!oldpassword || !newpassword || !confirmpassword) {
         return next(new HandleError("Please enter all fields", 400));
     }
+
     const isPasswordMatched = await user.comparePassword(oldpassword);
     if (!isPasswordMatched) {
         return next(new HandleError("Old password is incorrect", 400));
     }
+
     if (newpassword !== confirmpassword) {
         return next(new HandleError("Password doesn't match", 400));
     }
+
     user.password = newpassword;
+
     await user.save();
-    sendtoken(user, 200, res);
+
+    sendtoken(user, 200, res, "Password changed successfully");
 };
 
 //update profile for already logged in user
 export const updateProfile = async (req, res, next) => {
     const {name, email, avatar} = req.body;
 
-    const newUser={
-        name, email,
-    };
-    if (avatar){
+    const newUser={name, email};
+    if (avatar && avatar!== ""){
+        const user = await User.findById(req.user.id);
+        const imageId = user.avatar.public_id;
+        if(imageId){
+            await cloudinary.uploader.destroy(imageId);
+        }
+        const mycloud = await cloudinary.uploader.upload(avatar, {
+            folder: "Avatar",
+            width: 150,
+            crop: "scale",
+        });
         newUser.avatar={
-            public_id: avatar.public_id || "sample_id",
-            url: avatar.url || avatar,
+            public_id: mycloud.public_id,
+            url: mycloud.secure_url,
         };
     }
     const user = await User.findByIdAndUpdate(
-        req.user.id,
-        newUser,
+        req.user.id,newUser,
         { new: true, runValidators: true }
     );
     res.status(200).json({
         success: true,
         message: "Profile updated successfully",
+        // toast.success(result.payload.message),
         user,
     });
 };

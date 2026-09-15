@@ -1,11 +1,76 @@
 import Order from "../model/orderModels.js";
 import HandleError from "../helper/HandleError.js";
 import Product from "../model/ProductModels.js";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
+let razorpayInstance = null;
 
+const getRazorpay = () => {
+    if (!razorpayInstance && process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+        razorpayInstance = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+        });
+    }
+    return razorpayInstance;
+};
+
+export const createRazorpayOrder = async (req, res, next) => {
+    const { amount, currency = "INR", receipt } = req.body;
+
+    const razorpay = getRazorpay();
+    if (!razorpay) {
+        return next(new HandleError("Razorpay is not configured. Add real RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to backend/config/config.env", 500));
+    }
+
+    if (!amount || Number(amount) < 100) {
+        return next(new HandleError("Invalid payment amount", 400));
+    }
+
+    try {
+        const order = await razorpay.orders.create({
+            amount: Number(amount),
+            currency,
+            receipt: receipt || `receipt_${Date.now()}`,
+            notes: {
+                userId: req.user._id.toString(),
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            order,
+        });
+    } catch (error) {
+        console.error("Razorpay SDK Error:", error);
+        return next(new HandleError(error.message || "Razorpay order creation failed", 500));
+    }
+};
 
 export const createNewOrder = async (req, res, next) => {
     const { shippingInfo, orderItems, paymentInfo, itemsPrice, taxPrice, shippingPrice, totalPrice } = req.body;
+
+    // Verify Razorpay signature
+    if (paymentInfo && paymentInfo.id && paymentInfo.order_id && paymentInfo.signature) {
+        const body = paymentInfo.order_id + "|" + paymentInfo.id;
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(body.toString())
+            .digest("hex");
+
+        if (expectedSignature !== paymentInfo.signature) {
+            return next(new HandleError("Invalid payment signature. Payment verification failed.", 400));
+        }
+
+        // Prevent duplicate orders from the same payment ID
+        const existingOrder = await Order.findOne({ "paymentInfo.id": paymentInfo.id });
+        if (existingOrder) {
+            return next(new HandleError("An order with this payment ID has already been created.", 400));
+        }
+    } else {
+        return next(new HandleError("Missing payment information.", 400));
+    }
 
     const order = await Order.create({
         shippingInfo,

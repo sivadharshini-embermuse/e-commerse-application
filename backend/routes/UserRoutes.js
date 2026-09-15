@@ -8,16 +8,17 @@ router.post("/register", userRegistration);
 router.post("/login", loginUser);
 router.get("/logout", logoutUser);
 router.post("/password/forgot", forgotPassword);
-router.post("/reset/:token", resetPassword);
+router.put("/password/reset/:token", resetPassword);
 router.get("/profile", verifyUser, profile);
 router.put("/password/updatepassword", verifyUser, updatePassword);
 router.put("/profile/update", verifyUser, updateProfile);
+
+
 
 router.get("/admin/users", verifyUser, rolebasedAccess("admin"), getUsers);
 router.get("/admin/user/:id", verifyUser, rolebasedAccess("admin"), getsingleuser);
 router.put("/admin/user/:id", verifyUser, rolebasedAccess("admin"), updateuserrole);
 router.delete("/admin/user/:id", verifyUser, rolebasedAccess("admin"), deleteuser);
-
 
 
 
